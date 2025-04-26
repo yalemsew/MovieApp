@@ -1,39 +1,49 @@
 version: '3.8'
+
 services:
   mysql:
-    image: mysql:8
-    container_name: mysql-db
+    image: mysql:8.0
+    container_name: mysqldb
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: moviedb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
-      - movenet
+      - springboot-mysql
 
-  moviemail-app:
-    image: nahom20/moviemail:0.1.2
-    container_name: moviemail
-    depends_on:
-      - mysql
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/moviedb
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: cd3b2090b2d3c0936122e437934199b62a47de5130de31f7326675864da965793de9b8b9b86ae77fa37b6753784a7511d5f4371cdef06b03fc0c9129735c5e9a5416323c16d3700eb22d163d868f78201c2b93ac8ec61c6aaa1179f9eb1560a5276252f32f98248feffc69a09a4beda6e6470b34cf9538e0a903854c21b2d9caec494b16f7a08a3f3039578ad4674e777626a63e941e86c8298995a1b46d5b530c67f5b3d099c32b73cd5705657b55e85e75d32d0d03d102d4397159239124c12ecfcc6c6229bd850b00e2516f88367be07f8dff60543a02fd8c64754ea219eccc45a1f034a80c379579e4a54c4955a3b02805a1833bf6ca5bef9d62223640ed
-
+  springboot:
+    build: .
+    container_name: movie-app
+    restart: unless-stopped
     ports:
       - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/moviedb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
     networks:
-      - movenet
-
-volumes:
-  mysql_data:
+      - springboot-mysql
 
 networks:
-  movenet:
+  springboot-mysql:
+    driver: bridge
+
+volumes:
+  mysql-data:

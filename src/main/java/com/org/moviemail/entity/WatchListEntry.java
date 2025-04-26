@@ -15,13 +15,12 @@ public class WatchListEntry {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "dvd_id", nullable = false)
     private DVD dvd;
 
     private int priority;
 }
-
