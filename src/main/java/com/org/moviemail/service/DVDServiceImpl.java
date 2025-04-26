@@ -8,6 +8,7 @@ import com.org.moviemail.exception.internal.DVDDuplicateException;
 import com.org.moviemail.exception.internal.DVDNotFoundException;
 import com.org.moviemail.mapper.DVDMapper;
 import com.org.moviemail.repository.DVDRepository;
+import com.org.moviemail.repository.WatchlistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ public class DVDServiceImpl implements DVDService {
 
     private final DVDRepository dvdRepository;
     private final DVDMapper dvdMapper;
+    private final WatchlistRepository watchlistRepository;
 
     @Override
     public DVDResponseDto createDVD(DVDRequestDto dto) {
@@ -53,6 +55,13 @@ public class DVDServiceImpl implements DVDService {
     public void deleteDVDByScanCode(String scanCode) {
         DVD dvd = dvdRepository.findByScanCode(scanCode)
                 .orElseThrow(() -> new DVDNotFoundException("DVD not found"));
+
+        if (watchlistRepository.existsByDvdId(dvd.getId())) {
+            throw new RuntimeException("Cannot delete DVD. It is currently in use in a watchlist.");
+        }
+
         dvdRepository.delete(dvd);
     }
+
+
 }

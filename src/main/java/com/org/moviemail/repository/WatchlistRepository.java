@@ -11,5 +11,6 @@ public interface WatchlistRepository extends JpaRepository<WatchListEntry, Long>
     long countByCustomerId(Long customerId);
     List<WatchListEntry> findByCustomerIdOrderByPriorityAsc(Long customerId);
     Optional<WatchListEntry> findByCustomerIdAndDvdId(Long customerId, Long dvdId);
+    boolean existsByDvdId(Long dvdId);
 }
 
