@@ -7,5 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CustomerService {
     CustomerResponseDto createCustomer(CustomerRequestDto dto);
+    CustomerResponseDto getCustomerByEmail(String email);
 
 }

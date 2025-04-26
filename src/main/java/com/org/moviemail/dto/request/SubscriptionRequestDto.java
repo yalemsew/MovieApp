@@ -12,6 +12,6 @@ public record SubscriptionRequestDto(
         @DecimalMin(value = "0.0", inclusive = false)
         double pricePerMonth,
         @NotNull
-        Long customerId
+        Long customerId //how do you get customer id
 ) {}
 

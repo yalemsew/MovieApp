@@ -9,6 +9,9 @@ import com.org.moviemail.exception.internal.DVDNotFoundException;
 import com.org.moviemail.mapper.DVDMapper;
 import com.org.moviemail.repository.DVDRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,11 +35,13 @@ public class DVDServiceImpl implements DVDService {
         return dvdMapper.dvdToDVDResponseDTO(dvdRepository.save(dvd));
     }
 
-    @Override
-    public List<DVDResponseDto> getAllDVDs() {
-        return dvdMapper.dvdToDVDResponseDTOList(dvdRepository.findAll());
-    }
 
+    @Override
+    public Page<DVDResponseDto> getAllDVDs(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DVD> dvdPage = dvdRepository.findAll(pageable);
+        return dvdPage.map(dvdMapper::dvdToDVDResponseDTO);
+    }
     @Override
     public DVDResponseDto getDVDByScanCode(String scanCode) {
         DVD dvd = dvdRepository.findByScanCode(scanCode)

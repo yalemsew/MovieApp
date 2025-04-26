@@ -4,6 +4,7 @@ import com.org.moviemail.dto.request.DVDRequestDto;
 import com.org.moviemail.dto.response.DVDResponseDto;
 import com.org.moviemail.service.DVDService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,10 @@ public class DVDController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DVDResponseDto>> getAllDVDs() {
-        return ResponseEntity.ok(dvdService.getAllDVDs());
+    public ResponseEntity<Page<DVDResponseDto>> getAllDVDs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(dvdService.getAllDVDs(page, size));
     }
 
     @GetMapping("/{scanCode}")
